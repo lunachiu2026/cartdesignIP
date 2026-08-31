@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">暮光集所訂閱與交易系統流程圖</title>
+  <desc id="desc">呈現顧客登入、結帳與訂單流程，文創者從註冊、閱讀每月新台幣二百九十九元方案、模擬首次付款、待審、管理員核對付款申請詳情，到核准後開始計費並寄出模擬登入連結或駁回後模擬退款；另呈現到期、三日寬限、第四日鎖定及續費恢復商品的月訂閱生命週期。</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="175%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#315047" flood-opacity="0.11"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L10 5L0 10Z" fill="#58756B"/>
+    </marker>
+    <marker id="warmArrow" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L10 5L0 10Z" fill="#B45F48"/>
+    </marker>
+    <marker id="goldArrow" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L10 5L0 10Z" fill="#897B52"/>
+    </marker>
+    <style>
+      .zh { font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+      .title { fill: #203F37; font-size: 31px; font-weight: 750; letter-spacing: 2px; }
+      .subtitle { fill: #5C716A; font-size: 14px; font-weight: 500; letter-spacing: 0.7px; }
+      .lane-name { fill: #203F37; font-size: 20px; font-weight: 750; letter-spacing: 1.4px; }
+      .lane-en { fill: #5C716A; font-size: 10px; font-weight: 650; letter-spacing: 1.7px; }
+      .node-title { fill: #203F37; font-size: 15px; font-weight: 750; }
+      .node-sub { fill: #597069; font-size: 11.5px; font-weight: 500; }
+      .step { fill: #FFFFFF; font-size: 10.5px; font-weight: 750; text-anchor: middle; dominant-baseline: middle; }
+      .tag { fill: #3F5C53; font-size: 11px; font-weight: 700; letter-spacing: 0.15px; }
+      .small { fill: #65766F; font-size: 10.5px; font-weight: 500; }
+      .flow { fill: none; stroke: #58756B; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .event { fill: none; stroke: #B45F48; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 7 6; marker-end: url(#warmArrow); }
+      .renew { fill: none; stroke: #897B52; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#goldArrow); }
+    </style>
+  </defs>
+
+  <!-- Paper and decorative wash -->
+  <rect width="1600" height="1000" fill="#F7F0E3"/>
+  <path d="M0 0H1600V13C1290 30 1018 5 728 18C440 31 222 25 0 10Z" fill="#D99A7E" opacity="0.34"/>
+  <circle cx="1528" cy="69" r="89" fill="#DFB59F" opacity="0.17"/>
+  <circle cx="1468" cy="34" r="27" fill="#A9B9A8" opacity="0.24"/>
+
+  <!-- Header -->
+  <g class="zh">
+    <text class="title" x="44" y="52">暮光集所｜訂閱、販售與履約流程</text>
+    <text class="subtitle" x="46" y="80">文創者訂閱生命週期與顧客交易並行，身分入口與權限彼此隔離</text>
+
+    <rect x="46" y="94" width="688" height="27" rx="13.5" fill="#FFFCF5" stroke="#D8CCB9"/>
+    <circle cx="62" cy="107.5" r="4" fill="#B45F48"/>
+    <text x="75" y="112" fill="#66766F" font-size="11.5">前端展示版：金流、Email 寄送與時間排程皆為模擬，不會進行真實交易</text>
+
+    <g aria-label="登入入口邊界">
+      <rect x="770" y="88" width="355" height="34" rx="17" fill="#EDF1E8" stroke="#AAB9A7"/>
+      <rect x="785" y="95" width="76" height="20" rx="10" fill="#DCE6D8"/>
+      <text class="tag" x="823" y="109" text-anchor="middle">顧客入口</text>
+      <text class="small" x="873" y="109">註冊／登入後結帳、查訂單</text>
+
+      <rect x="1141" y="88" width="413" height="34" rx="17" fill="#F3E4D9" stroke="#C7957F"/>
+      <rect x="1156" y="95" width="108" height="20" rx="10" fill="#EDD1C2"/>
+      <text class="tag" x="1210" y="109" text-anchor="middle">獨立後台入口</text>
+      <text class="small" x="1277" y="109">文創者 Email 連結／管理員直接登入</text>
+    </g>
+  </g>
+
+  <!-- Customer lane -->
+  <g aria-label="顧客交易泳道">
+    <rect x="32" y="138" width="1536" height="170" rx="26" fill="#EDF1E8" stroke="#AAB9A7" stroke-width="1.5"/>
+    <rect x="48" y="154" width="116" height="138" rx="21" fill="#B8C6B4"/>
+    <circle cx="106" cy="190" r="21" fill="#F7F0E3"/>
+    <path d="M97 189c0-6 3.7-10.5 9-10.5s9 4.5 9 10.5c0 7-3.7 10.5-9 10.5s-9-3.5-9-10.5Zm-7 24c3.5-7 9-10 16-10s12.5 3 16 10" fill="none" stroke="#315047" stroke-width="2.7" stroke-linecap="round"/>
+    <g class="zh" text-anchor="middle">
+      <text class="lane-name" x="106" y="242">顧客</text>
+      <text class="lane-en" x="106" y="262">CUSTOMER</text>
+      <rect x="68" y="272" width="76" height="20" rx="10" fill="#F7F0E3" opacity="0.92"/>
+      <text class="tag" x="106" y="286">公開前台</text>
+    </g>
+
+    <path d="M381 224H405" class="flow"/>
+    <path d="M596 224H620" class="flow"/>
+    <path d="M811 224H835" class="flow"/>
+    <path d="M1026 224H1050" class="flow"/>
+    <path d="M1241 224H1265" class="flow"/>
+
+    <g filter="url(#shadow)">
+      <rect x="190" y="177" width="191" height="94" rx="16" fill="#FFFCF5" stroke="#8FA58E"/>
+      <rect x="405" y="177" width="191" height="94" rx="16" fill="#FFFCF5" stroke="#8FA58E"/>
+      <rect x="620" y="177" width="191" height="94" rx="16" fill="#DCE6D8" stroke="#789376"/>
+      <rect x="835" y="177" width="191" height="94" rx="16" fill="#FFFCF5" stroke="#8FA58E"/>
+      <rect x="1050" y="177" width="191" height="94" rx="16" fill="#DCE6D8" stroke="#789376"/>
+      <rect x="1265" y="177" width="265" height="94" rx="16" fill="#FFFCF5" stroke="#8FA58E"/>
+    </g>
+    <g fill="#6F8C78">
+      <circle cx="208" cy="195" r="11"/><circle cx="423" cy="195" r="11"/><circle cx="638" cy="195" r="11"/>
+      <circle cx="853" cy="195" r="11"/><circle cx="1068" cy="195" r="11"/><circle cx="1283" cy="195" r="11"/>
+    </g>
+    <g class="zh step">
+      <text x="208" y="195">1</text><text x="423" y="195">2</text><text x="638" y="195">3</text>
+      <text x="853" y="195">4</text><text x="1068" y="195">5</text><text x="1283" y="195">6</text>
+    </g>
+    <g class="zh" text-anchor="middle">
+      <text class="node-title" x="285.5" y="221">瀏覽商品／購物車</text>
+      <text class="node-sub" x="285.5" y="244">未登入仍可探索</text>
+
+      <text class="node-title" x="500.5" y="221">顧客註冊／登入</text>
+      <text class="node-sub" x="500.5" y="244">建立 customerSession</text>
+
+      <text class="node-title" x="715.5" y="221">結帳</text>
+      <text class="node-sub" x="715.5" y="244">登入後填寫配送與付款</text>
+
+      <text class="node-title" x="930.5" y="221">建立訂單</text>
+      <text class="node-sub" x="930.5" y="244">綁定顧客並拆分品項</text>
+
+      <text class="node-title" x="1145.5" y="221">我的訂單</text>
+      <text class="node-sub" x="1145.5" y="244">查看本人訂單與詳情</text>
+
+      <text class="node-title" x="1397.5" y="221">訂單狀態</text>
+      <text class="node-sub" x="1397.5" y="243">待處理 → 備貨 → 已出貨 → 完成</text>
+    </g>
+  </g>
+
+  <!-- Creator subscription application lane -->
+  <g aria-label="文創者訂閱申請泳道">
+    <rect x="32" y="328" width="1536" height="292" rx="26" fill="#F3E4D9" stroke="#C7957F" stroke-width="1.5"/>
+    <rect x="48" y="344" width="116" height="260" rx="21" fill="#DCA085"/>
+    <circle cx="106" cy="382" r="21" fill="#F7F0E3"/>
+    <path d="M94 389c8-2 16-9 20-18 3.5 6.5 6 11 8 18M99 384l7 7 11-13" fill="none" stroke="#704536" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g class="zh" text-anchor="middle">
+      <text class="lane-name" x="106" y="434">文創者</text>
+      <text class="lane-en" x="106" y="454">CREATOR</text>
+      <rect x="63" y="468" width="86" height="20" rx="10" fill="#F7F0E3" opacity="0.92"/>
+      <text class="tag" x="106" y="482">訂閱申請</text>
+      <line x1="70" y1="507" x2="142" y2="507" stroke="#B9785D" opacity="0.65"/>
+      <text class="small" x="106" y="528">核准後才可</text>
+      <text class="small" x="106" y="545">進入工作室</text>
+    </g>
+
+    <path d="M375 423H397" class="flow"/>
+    <path d="M582 423H604" class="flow"/>
+    <path d="M789 423H811" class="flow"/>
+
+    <g filter="url(#shadow)">
+      <rect x="190" y="369" width="185" height="108" rx="17" fill="#FFFCF5" stroke="#C28A72"/>
+      <rect x="397" y="369" width="185" height="108" rx="17" fill="#FFFCF5" stroke="#C28A72"/>
+      <rect x="604" y="369" width="185" height="108" rx="17" fill="#EDD1C2" stroke="#B9785D"/>
+      <rect x="811" y="369" width="185" height="108" rx="17" fill="#FFFCF5" stroke="#C28A72"/>
+      <rect x="1050" y="369" width="216" height="108" rx="17" fill="#DCE6D8" stroke="#789376" stroke-width="1.4"/>
+      <rect x="1290" y="369" width="240" height="108" rx="17" fill="#DCE6D8" stroke="#789376" stroke-width="1.4"/>
+      <rect x="1050" y="500" width="216" height="82" rx="17" fill="#FFF6ED" stroke="#B9785D" stroke-width="1.4"/>
+    </g>
+
+    <g fill="#B96E52">
+      <circle cx="209" cy="389" r="11"/><circle cx="416" cy="389" r="11"/><circle cx="623" cy="389" r="11"/><circle cx="830" cy="389" r="11"/>
+    </g>
+    <g class="zh step">
+      <text x="209" y="389">1</text><text x="416" y="389">2</text><text x="623" y="389">3</text><text x="830" y="389">4</text>
+    </g>
+    <g class="zh" text-anchor="middle">
+      <text class="node-title" x="282.5" y="418">註冊文創者</text>
+      <text class="node-sub" x="282.5" y="441">填寫品牌與申請資料</text>
+      <text class="node-sub" x="282.5" y="458">建立申請身分</text>
+
+      <text class="node-title" x="489.5" y="414">閱讀方案條款</text>
+      <text x="489.5" y="438" fill="#824432" font-size="13" font-weight="750">NT$299／月</text>
+      <text class="node-sub" x="489.5" y="458">確認週期與續訂規則</text>
+
+      <text class="node-title" x="696.5" y="418">模擬首次付款</text>
+      <text class="node-sub" x="696.5" y="441">產生付款成功紀錄</text>
+      <text class="node-sub" x="696.5" y="458">尚未開始月計費</text>
+
+      <text class="node-title" x="903.5" y="418">待審核</text>
+      <text class="node-sub" x="903.5" y="441">已付款申請進入清單</text>
+      <text class="node-sub" x="903.5" y="458">等待管理員核對</text>
+
+      <text class="node-title" x="1158" y="411">核准：開始月計費</text>
+      <text class="node-sub" x="1158" y="435">建立 NT$299／月訂閱</text>
+      <text class="node-sub" x="1158" y="454">設定下次續費到期日</text>
+
+      <text class="node-title" x="1410" y="410">模擬 Email 登入連結</text>
+      <text class="node-sub" x="1410" y="434">由信件連結進入文創者工作室</text>
+      <text x="1410" y="457" fill="#315047" font-size="12" font-weight="750">核准文創者可發布商品</text>
+
+      <text class="node-title" x="1158" y="532">駁回：模擬退款</text>
+      <text class="node-sub" x="1158" y="555">退回首次付款並附審核理由</text>
+    </g>
+
+    <path d="M1266 423H1290" class="flow"/>
+    <rect x="1282" y="346" width="164" height="22" rx="11" fill="#F7F0E3" stroke="#AAB9A7"/>
+    <text class="zh tag" x="1364" y="361" text-anchor="middle">approved 才能發布</text>
+  </g>
+
+  <!-- Admin review lane -->
+  <g aria-label="平台管理員審核泳道">
+    <rect x="32" y="640" width="1536" height="166" rx="26" fill="#E7E2D3" stroke="#A99E82" stroke-width="1.5"/>
+    <rect x="48" y="656" width="116" height="134" rx="21" fill="#C5B995"/>
+    <circle cx="106" cy="689" r="20" fill="#F7F0E3"/>
+    <path d="M106 675l12 5v9c0 8.5-5 14-12 17.5-7-3.5-12-9-12-17.5v-9l12-5Zm-5 15 3.5 3.5 7-8" fill="none" stroke="#4E513D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <g class="zh" text-anchor="middle">
+      <text class="lane-name" x="106" y="735">管理員</text>
+      <text class="lane-en" x="106" y="754">ADMIN</text>
+      <rect x="63" y="766" width="86" height="20" rx="10" fill="#F7F0E3" opacity="0.92"/>
+      <text class="tag" x="106" y="780">獨立後台</text>
+    </g>
+
+    <path d="M432 724H462" class="flow"/>
+    <path d="M686 724H716" class="flow"/>
+    <path d="M1020 724H1060" class="flow"/>
+    <path d="M1226 724H1270" class="flow"/>
+
+    <g filter="url(#shadow)">
+      <rect x="190" y="674" width="242" height="100" rx="16" fill="#FFFCF5" stroke="#A99E82"/>
+      <rect x="462" y="674" width="224" height="100" rx="16" fill="#FFFCF5" stroke="#A99E82"/>
+      <rect x="716" y="674" width="304" height="100" rx="16" fill="#DDD6BE" stroke="#938665"/>
+      <rect x="1270" y="674" width="260" height="100" rx="16" fill="#FFFCF5" stroke="#A99E82"/>
+    </g>
+    <polygon points="1143,669 1226,724 1143,779 1060,724" fill="#EDD1C2" stroke="#B9785D" stroke-width="1.5" filter="url(#shadow)"/>
+
+    <g class="zh" text-anchor="middle">
+      <text class="node-title" x="311" y="710">直接網址登入管理後台</text>
+      <text class="node-sub" x="311" y="734">不出現在公開導覽</text>
+      <text class="node-sub" x="311" y="752">建立 admin backofficeSession</text>
+
+      <text class="node-title" x="574" y="710">開啟待審申請</text>
+      <text class="node-sub" x="574" y="734">選取已付款文創者</text>
+      <text class="node-sub" x="574" y="752">查看完整申請</text>
+
+      <text class="node-title" x="868" y="707">核對已付款申請詳情</text>
+      <text class="node-sub" x="868" y="732">付款紀錄、品牌資料、作品內容</text>
+      <text class="node-sub" x="868" y="751">確認後才進行審核決策</text>
+
+      <text class="node-title" x="1143" y="718">核准</text>
+      <text class="node-title" x="1143" y="739">或駁回</text>
+
+      <text class="node-title" x="1400" y="710">平台與訂單管理</text>
+      <text class="node-sub" x="1400" y="734">商品、分類、文創者與訂單</text>
+      <text class="node-sub" x="1400" y="752">既有訂單持續可履約</text>
+    </g>
+
+    <rect x="190" y="650" width="196" height="22" rx="11" fill="#F7F0E3" stroke="#A99E82"/>
+    <text class="zh tag" x="288" y="665" text-anchor="middle">與顧客登入入口完全分離</text>
+  </g>
+
+  <!-- Cross-lane application and decision events -->
+  <g class="zh" aria-label="審核跨泳道事件">
+    <path d="M903 477V628H574V674" class="event"/>
+    <rect x="665" y="603" width="220" height="24" rx="12" fill="#F7F0E3" stroke="#D9A28C"/>
+    <text x="775" y="619" fill="#824432" font-size="10.5" font-weight="700" text-anchor="middle">付款成功後送入待審清單</text>
+
+    <path d="M1143 669V605H1158V477" class="event"/>
+    <rect x="1169" y="594" width="79" height="22" rx="11" fill="#F7F0E3" stroke="#AAB9A7"/>
+    <text x="1208.5" y="609" fill="#315047" font-size="10.5" font-weight="700" text-anchor="middle">核准</text>
+
+    <path d="M1226 724H1251V541H1266" class="event"/>
+    <rect x="1255" y="614" width="79" height="22" rx="11" fill="#F7F0E3" stroke="#D9A28C"/>
+    <text x="1294.5" y="629" fill="#824432" font-size="10.5" font-weight="700" text-anchor="middle">駁回</text>
+  </g>
+
+  <!-- Monthly renewal lifecycle -->
+  <g aria-label="月訂閱續期生命週期">
+    <rect x="32" y="826" width="1536" height="134" rx="26" fill="#F0EBDD" stroke="#B1A47E" stroke-width="1.5"/>
+    <rect x="48" y="842" width="116" height="102" rx="21" fill="#C9BE9C"/>
+    <g class="zh" text-anchor="middle">
+      <text class="lane-name" x="106" y="879">月續訂</text>
+      <text class="lane-en" x="106" y="899">RENEWAL</text>
+      <text class="small" x="106" y="923">NT$299／月</text>
+    </g>
+
+    <path d="M410 880H438" class="renew"/>
+    <path d="M706 880H734" class="renew"/>
+    <path d="M1072 880H1100" class="renew"/>
+
+    <g filter="url(#shadow)">
+      <rect x="190" y="847" width="220" height="67" rx="15" fill="#FFFCF5" stroke="#A99E82"/>
+      <rect x="438" y="847" width="268" height="67" rx="15" fill="#FFF6ED" stroke="#C28A72"/>
+      <rect x="734" y="840" width="338" height="81" rx="15" fill="#EDD1C2" stroke="#B9785D" stroke-width="1.4"/>
+      <rect x="1100" y="840" width="430" height="81" rx="15" fill="#DCE6D8" stroke="#789376" stroke-width="1.4"/>
+    </g>
+    <g class="zh" text-anchor="middle">
+      <text class="node-title" x="300" y="873">續費到期日</text>
+      <text class="node-sub" x="300" y="895">執行模擬自動續扣</text>
+
+      <text class="node-title" x="572" y="871">付款未完成 → 3 日寬限</text>
+      <text x="572" y="895" fill="#824432" font-size="11.5" font-weight="750">第 1–3 日仍可販售</text>
+
+      <text class="node-title" x="903" y="865">第 4 日鎖定</text>
+      <text class="node-sub" x="903" y="887">商品仍公開，標示「暫停販售」</text>
+      <text x="903" y="907" fill="#824432" font-size="11.5" font-weight="750">顧客不可購買</text>
+
+      <text class="node-title" x="1315" y="865">續費成功，自動解除鎖定</text>
+      <text class="node-sub" x="1315" y="887">自動恢復鎖定前「上架中」的商品</text>
+      <text class="node-sub" x="1315" y="906">原本下架的商品維持下架</text>
+    </g>
+
+    <rect x="365" y="928" width="1000" height="22" rx="11" fill="#FFFCF5" stroke="#B1A47E"/>
+    <circle cx="384" cy="939" r="3.5" fill="#6F8C78"/>
+    <text class="zh tag" x="865" y="943" text-anchor="middle">寬限或鎖定不影響既有訂單：文創者仍可查看訂單、備貨、出貨並完成履約</text>
+  </g>
+
+  <!-- Footer -->
+  <g class="zh">
+    <text x="44" y="983" fill="#66766F" font-size="10.5">Session 邊界：顧客使用 customerSession；文創者與管理員使用依角色隔離的 backofficeSession</text>
+    <text x="1555" y="983" fill="#66766F" font-size="10.5" text-anchor="end" letter-spacing="0.9">FRONTEND DEMO ONLY · PAYMENT / EMAIL / SCHEDULER SIMULATED</text>
+  </g>
+</svg>

@@ -1,0 +1,1 @@
+<template><section class="section-space text-center"><div class="container"><p class="eyebrow">404 Lost in the woods</p><h1 class="display-3">這裡沒有你找的頁面</h1><p class="section-copy">也許它正在某位創作者的工作桌上，慢慢成形。</p><RouterLink class="btn btn-primary mt-3" to="/">回到暮光集所</RouterLink></div></section></template>
