@@ -1,9 +1,10 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useMarketStore } from '../../stores/market'
 
 const route = useRoute()
+const router = useRouter()
 const store = useMarketStore()
 
 const loading = ref(false)
@@ -30,7 +31,7 @@ const approvalPath = computed(() => ({
 const displayApprovalUrl = computed(() => {
   if (!resolvedToken.value || !mailEmail.value) return ''
   const origin = typeof window === 'undefined' ? 'https://muguang.tw' : window.location.origin
-  return `${origin}/creator/login?approvalToken=${encodeURIComponent(resolvedToken.value)}&email=${encodeURIComponent(mailEmail.value)}`
+  return new URL(router.resolve(approvalPath.value).href, origin).href
 })
 const isExpired = computed(() => {
   if (state.value === 'expired') return true
