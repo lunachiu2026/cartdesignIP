@@ -26,13 +26,7 @@ npm run build
 npm run preview
 ```
 
-## 展示帳號
 
-| 身分 | 帳號 | 密碼 | 登入入口 |
-|---|---|---|---|
-| 顧客會員 | `member@demo.tw` | `123456` | `/account/login` |
-| 創作者 | `creator@demo.tw` | `123456` | `/creator/login` |
-| 平台管理員 | `admin@muguang.tw` | `admin123` | `/muguang/admin` |
 
 顧客登入頁會顯示展示帳號；創作者及管理員登入頁需點擊「展示模式」才會帶入測試帳號。平台管理員入口不會出現在公開網站導覽中。
 
