@@ -16,8 +16,14 @@ const links = computed(() => {
     { to: '/admin/products', icon: 'box-seam', label: '全站商品' },
     { to: '/admin/categories', icon: 'tags', label: '分類管理' },
     { to: '/admin/orders', icon: 'receipt', label: '全站訂單' },
+    { to: '/admin/banners', icon: 'image', label: '廣告版位' },
   ]
   if (store.currentCreator?.status !== 'approved') return [
+    ...(store.currentCreator?.status === 'suspended' ? [
+      { to: '/creator/dashboard', icon: 'grid', label: '工作室總覽' },
+      { to: '/creator/products', icon: 'lock', label: '我的商品（已鎖定）' },
+      { to: '/creator/orders', icon: 'receipt', label: '訂單管理' },
+    ] : []),
     { to: '/creator/onboarding', icon: 'signpost-split', label: '合作進度' },
     { to: '/creator/subscription', icon: 'credit-card', label: '訂閱與付款' },
     { to: '/creator/profile', icon: 'shop', label: '品牌資料' },

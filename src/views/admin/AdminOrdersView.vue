@@ -13,13 +13,15 @@ const statusOptions = [
   { value: 'processing', label: '處理中' },
   { value: 'shipped', label: '已出貨' },
   { value: 'completed', label: '已完成' },
+  { value: 'cancelled', label: '已取消退款' },
 ]
 
-const editableStatuses = statusOptions.slice(1)
+const editableStatuses = statusOptions.slice(1).filter((option) => option.value !== 'cancelled')
 const orderStatus = {
   processing: { label: '處理中', className: 'status-processing' },
   shipped: { label: '已出貨', className: 'status-shipped' },
   completed: { label: '已完成', className: 'status-completed' },
+  cancelled: { label: '已取消退款', className: 'status-suspended' },
 }
 
 const filteredOrders = computed(() => {
@@ -128,9 +130,11 @@ function changeStatus(order, event) {
                   :id="`order-status-${order.id}`"
                   class="form-select form-select-sm text-nowrap"
                   :value="order.status"
+                  :disabled="order.status === 'cancelled'"
                   style="min-width: 110px"
                   @change="changeStatus(order, $event)"
                 >
+                  <option v-if="order.status === 'cancelled'" value="cancelled" disabled>已取消退款</option>
                   <option v-for="option in editableStatuses" :key="option.value" :value="option.value">{{ option.label }}</option>
                 </select>
               </td>

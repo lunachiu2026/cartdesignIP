@@ -19,8 +19,8 @@ const subscriptionStatus = computed(() => typeof subscriptionResult.value === 's
     <div class="success-card">
       <div class="success-mark"><i class="bi bi-check-lg"></i><span></span><span></span></div>
       <p class="eyebrow">Payment completed</p>
-      <h1>付款完成，審核已經開始</h1>
-      <p class="lead-copy">謝謝你完成創作者月訂閱。暮光集所已收到 {{ creator?.name || '你的品牌' }} 的申請，平台現在開始檢視品牌與創作資料。</p>
+      <h1>已送出申請，待管理員審核</h1>
+      <p class="lead-copy">付款已完成。暮光集所已收到 {{ creator?.name || '你的品牌' }} 的申請，管理員核准當日才會開始計算新的訂閱週期。</p>
 
       <div class="receipt">
         <div><span>付款結果</span><strong><i class="bi bi-check-circle-fill"></i> 已完成</strong></div>

@@ -1,8 +1,10 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useMarketStore } from '../../stores/market'
 
 const store = useMarketStore()
+const router = useRouter()
 
 const creator = computed(() => store.currentCreator)
 const creatorStatus = computed(() => creator.value?.status || 'awaiting_payment')
@@ -17,6 +19,7 @@ const creatorStatuses = {
   pending: { label: '資料審核中', tone: 'info', icon: 'hourglass-split', step: 3 },
   rejected: { label: '申請未通過', tone: 'danger', icon: 'x-circle', step: 3 },
   approved: { label: '合作已核准', tone: 'success', icon: 'patch-check', step: 4 },
+  suspended: { label: '合作資格已停權', tone: 'danger', icon: 'lock', step: 2 },
 }
 
 const subscriptionStatuses = {
@@ -38,6 +41,10 @@ const steps = [
 const currentStep = computed(() => creatorStatuses[creatorStatus.value]?.step || 1)
 const statusDetail = computed(() => creatorStatuses[creatorStatus.value] || creatorStatuses.awaiting_payment)
 const subscriptionDetail = computed(() => subscriptionStatuses[subscriptionStatus.value] || subscriptionStatuses.unpaid)
+
+watch(creatorStatus, (status, previousStatus) => {
+  if (status === 'approved' && previousStatus && previousStatus !== 'approved') router.replace('/creator/dashboard')
+})
 </script>
 
 <template>
@@ -97,6 +104,12 @@ const subscriptionDetail = computed(() => subscriptionStatuses[subscriptionStatu
               <div class="instruction-box"><strong>{{ canPublish ? '工作室已準備完成' : '發佈權限暫停' }}</strong><span>{{ canPublish ? '先完善品牌頁，再上架第一件作品，讓顧客完整認識你的創作。' : '前往訂閱中心查看狀態與補繳方式。' }}</span></div>
               <RouterLink v-if="canPublish" class="btn btn-accent" to="/creator/dashboard">進入創作者工作室</RouterLink>
               <RouterLink v-else class="btn btn-accent" to="/creator/subscription">處理訂閱狀態</RouterLink>
+            </template>
+
+            <template v-else-if="creatorStatus === 'suspended'">
+              <p>你仍可登入工作室查看品牌資料，但目前商品已鎖定並停止公開販售。</p>
+              <div class="instruction-box instruction-danger"><strong>重新申請合作</strong><span>請重新支付 NT$299 訂閱費。付款後會送出申請，待管理員審核通過當日才重新計算訂閱起始日。</span></div>
+              <RouterLink class="btn btn-accent" to="/creator/subscription/checkout">重新訂閱並送出申請</RouterLink>
             </template>
           </div>
         </article>

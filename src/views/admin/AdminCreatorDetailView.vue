@@ -104,10 +104,6 @@ function suspendCreator() {
   suspendReason.value = ''
 }
 
-function restoreCreator() {
-  if (!creator.value || !window.confirm(`確定恢復「${creator.value.name}」的合作資格嗎？`)) return
-  store.setCreatorStatus(creator.value.id, 'approved', '管理員恢復合作資格')
-}
 </script>
 
 <template>
@@ -307,8 +303,7 @@ function restoreCreator() {
             </form>
 
             <div v-else-if="creator.status === 'suspended'">
-              <p class="text-secondary small">恢復後，創作者可重新登入後台並繼續合作。</p>
-              <button class="btn btn-primary w-100" type="button" @click="restoreCreator">恢復合作資格</button>
+              <p class="text-secondary small mb-0"><i class="bi bi-lock me-2"></i>商品已鎖定。等待創作者重新支付訂閱費後，系統會將申請轉為待審核。</p>
             </div>
 
             <p v-else class="text-secondary mb-0">此狀態目前沒有可執行的審核操作。</p>
@@ -373,14 +368,34 @@ function restoreCreator() {
 
 .application-data dt,
 .application-data dd {
+  padding-right: .75rem;
+  padding-left: .75rem;
   padding-top: .65rem;
   padding-bottom: .65rem;
   border-bottom: 1px solid var(--line);
 }
 
+.application-data {
+  display: grid;
+  grid-template-columns: minmax(150px, 25%) 1fr;
+  margin-right: 0;
+  margin-left: 0;
+  --bs-gutter-x: 0;
+}
+
+.application-data > * {
+  width: auto;
+  max-width: none;
+  margin: 0;
+}
+
 .application-data dt {
   color: var(--ink-soft);
   font-weight: 500;
+}
+
+@media (max-width: 575.98px) {
+  .application-data { grid-template-columns: 1fr; }
 }
 
 .application-section {

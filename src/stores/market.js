@@ -3,7 +3,36 @@ import { defineStore } from 'pinia'
 import { seedCreatorNotifications, seedCreators, seedCustomers, seedOrders, seedProducts, seedSubscriptionOrders } from '../data/seed.js'
 
 const STORAGE_KEY = 'muguang-market-v3'
+const BACKOFFICE_SESSION_KEY = 'muguang-backoffice-session-v1'
 const seedCategories = ['紙品', '陶藝', '布作', '木作', '其他手作']
+const emptyBanner = () => ({
+  enabled: false,
+  image: '',
+  title: '',
+  description: '',
+  buttonLabel: '',
+  link: '',
+  fit: 'cover',
+  position: 'center',
+})
+const seedHomeSlides = [
+  { enabled: true, image: '/images/muguang-meet-the-maker-banner.png', title: '遇見作品背後的創作者', description: '走進工作室，看見一件作品如何從雙手與日常慢慢成形。', buttonLabel: '認識創作者', link: '/?section=creators' },
+  { enabled: true, image: '/images/muguang-quality-objects-banner.png', title: '把有質感的小物帶進日常', description: '從陶器、紙品到生活布作，收藏值得長久陪伴的物件。', buttonLabel: '開始逛選物', link: '/products' },
+  { enabled: true, image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=85', title: '紙上留下創作的溫度', description: '遇見來自獨立創作者的插畫與紙品。', buttonLabel: '探索紙品', link: '/products?category=紙品' },
+  { enabled: true, image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=1600&q=85', title: '每一道釉色都不完全相同', description: '慢慢製作的陶器，讓日常多一點手感。', buttonLabel: '探索陶藝', link: '/products?category=陶藝' },
+  { enabled: true, image: 'https://images.unsplash.com/photo-1528396518501-b53b655eb9b3?auto=format&fit=crop&w=1600&q=85', title: '讓自然材質陪伴生活', description: '以棉麻與植物色彩縫製的生活布作。', buttonLabel: '探索布作', link: '/products?category=布作' },
+  emptyBanner(),
+  emptyBanner(),
+  emptyBanner(),
+]
+const seedStorySlides = seedHomeSlides.map((slide) => ({ ...slide }))
+const seedBanners = {
+  homeSlides: seedHomeSlides,
+  storySlides: seedStorySlides,
+  homeCarouselSeeded: true,
+  products: { enabled: false, image: '', title: '', description: '', buttonLabel: '', link: '' },
+  about: { enabled: false, image: '', title: '', description: '', buttonLabel: '', link: '' },
+}
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 const addDays = (value, days) => {
@@ -31,10 +60,12 @@ export const useMarketStore = defineStore('market', () => {
   const customers = ref([])
   const subscriptionOrders = ref([])
   const creatorNotifications = ref([])
+  const banners = ref(clone(seedBanners))
   const cart = ref([])
   const customerSession = ref(null)
   const backofficeSession = ref(null)
   const lastOrderIds = ref([])
+  let storageListenerAttached = false
 
   const currentCreator = computed(() => creators.value.find((item) => item.id === backofficeSession.value?.creatorId))
   const currentCustomer = computed(() => customers.value.find((item) => item.id === customerSession.value?.customerId))
@@ -58,11 +89,48 @@ export const useMarketStore = defineStore('market', () => {
       customers: customers.value,
       subscriptionOrders: subscriptionOrders.value,
       creatorNotifications: creatorNotifications.value,
+      banners: banners.value,
       cart: cart.value,
       customerSession: customerSession.value,
-      backofficeSession: backofficeSession.value,
       lastOrderIds: lastOrderIds.value,
     }))
+    if (backofficeSession.value) sessionStorage.setItem(BACKOFFICE_SESSION_KEY, JSON.stringify(backofficeSession.value))
+    else sessionStorage.removeItem(BACKOFFICE_SESSION_KEY)
+  }
+
+  function syncSharedData(data) {
+    creators.value = data.creators || clone(seedCreators)
+    products.value = data.products || clone(seedProducts)
+    orders.value = data.orders || clone(seedOrders)
+    categories.value = data.categories || clone(seedCategories)
+    customers.value = data.customers || clone(seedCustomers)
+    subscriptionOrders.value = data.subscriptionOrders || clone(seedSubscriptionOrders)
+    creatorNotifications.value = data.creatorNotifications || clone(seedCreatorNotifications)
+    const savedBanners = data.banners || {}
+    const savedHomeSlides = Array.isArray(savedBanners.homeSlides)
+      ? savedBanners.homeSlides
+      : savedBanners.home?.image
+        ? [savedBanners.home]
+        : []
+    const savedStorySlides = Array.isArray(savedBanners.storySlides) ? savedBanners.storySlides : []
+    const shouldSeedHomeCarousel = savedBanners.homeCarouselSeeded !== true
+    banners.value = {
+      ...clone(seedBanners),
+      ...savedBanners,
+      homeSlides: Array.from({ length: 8 }, (_, index) => {
+        const savedSlide = savedHomeSlides[index]
+        const slide = shouldSeedHomeCarousel && !savedSlide?.image ? seedHomeSlides[index] : savedSlide || seedHomeSlides[index]
+        return { ...emptyBanner(), ...slide }
+      }),
+      storySlides: Array.from({ length: 8 }, (_, index) => ({
+        ...emptyBanner(),
+        ...(savedStorySlides[index] || seedStorySlides[index] || emptyBanner()),
+      })),
+      homeCarouselSeeded: true,
+    }
+    cart.value = data.cart || []
+    customerSession.value = data.customerSession || null
+    lastOrderIds.value = data.lastOrderIds || []
   }
 
   function initialize() {
@@ -71,22 +139,25 @@ export const useMarketStore = defineStore('market', () => {
     if (saved) {
       try {
         const data = JSON.parse(saved)
-        creators.value = data.creators || clone(seedCreators)
-        products.value = data.products || clone(seedProducts)
-        orders.value = data.orders || clone(seedOrders)
-        categories.value = data.categories || clone(seedCategories)
-        customers.value = data.customers || clone(seedCustomers)
-        subscriptionOrders.value = data.subscriptionOrders || clone(seedSubscriptionOrders)
-        creatorNotifications.value = data.creatorNotifications || clone(seedCreatorNotifications)
-        cart.value = data.cart || []
-        customerSession.value = data.customerSession || null
-        backofficeSession.value = data.backofficeSession || null
-        lastOrderIds.value = data.lastOrderIds || []
+        syncSharedData(data)
+        const savedSession = sessionStorage.getItem(BACKOFFICE_SESSION_KEY)
+        backofficeSession.value = savedSession ? JSON.parse(savedSession) : data.backofficeSession || null
       } catch {
         resetData()
       }
     } else {
       resetData()
+    }
+    if (!storageListenerAttached) {
+      window.addEventListener('storage', (event) => {
+        if (event.key !== STORAGE_KEY || !event.newValue) return
+        try {
+          syncSharedData(JSON.parse(event.newValue))
+        } catch {
+          // Ignore incomplete writes from another tab.
+        }
+      })
+      storageListenerAttached = true
     }
     initialized.value = true
   }
@@ -100,6 +171,7 @@ export const useMarketStore = defineStore('market', () => {
     customers.value = clone(seedCustomers)
     subscriptionOrders.value = clone(seedSubscriptionOrders)
     creatorNotifications.value = clone(seedCreatorNotifications)
+    banners.value = clone(seedBanners)
     cart.value = []
     customerSession.value = null
     backofficeSession.value = activeAdminSession
@@ -182,7 +254,7 @@ export const useMarketStore = defineStore('market', () => {
     }
     const creator = creators.value.find((item) => item.email === email && item.password === password)
     if (!creator) return { ok: false, message: '帳號或密碼不正確' }
-    if (creator.status === 'suspended') return { ok: false, message: '此帳號目前已停權' }
+    if (creator.exitedAt) return { ok: false, message: '此帳號已退出暮光集所' }
     if (approvalToken) {
       const notification = creatorNotifications.value.find((item) => item.approvalToken === approvalToken && item.creatorId === creator.id)
       if (!notification || notification.type !== 'approved') return { ok: false, message: '審核登入連結無效或不屬於此帳號' }
@@ -277,13 +349,13 @@ export const useMarketStore = defineStore('market', () => {
   function payCreatorSubscription(paymentMethod = 'credit_card') {
     const creator = currentCreator.value
     if (!creator || backofficeSession.value?.role !== 'creator') return { ok: false, message: '請先登入創作者帳號' }
-    if (!['awaiting_payment', 'approved'].includes(creator.status)) return { ok: false, message: creator.status === 'rejected' ? '請先更新品牌資料並重新送出申請' : '目前狀態不需要重複付款' }
+    if (!['awaiting_payment', 'approved', 'suspended'].includes(creator.status)) return { ok: false, message: creator.status === 'rejected' ? '請先更新品牌資料並重新送出申請' : '目前狀態不需要重複付款' }
     if (creator.status === 'approved' && !['grace', 'locked'].includes(getCreatorSubscriptionStatus(creator).status)) return { ok: false, message: '目前訂閱仍在有效期間' }
     const paidAt = new Date().toISOString()
     const order = {
       id: `SUB-${Date.now().toString().slice(-10)}`,
       creatorId: creator.id,
-      type: creator.status === 'approved' ? 'renewal' : 'initial',
+      type: creator.status === 'approved' ? 'renewal' : creator.status === 'suspended' ? 'reactivation' : 'initial',
       amount: 299,
       status: 'paid',
       paymentMethod,
@@ -343,6 +415,115 @@ export const useMarketStore = defineStore('market', () => {
     return true
   }
 
+  function setCreatorAutoRenew(enabled) {
+    const creator = currentCreator.value
+    if (!creator || backofficeSession.value?.role !== 'creator' || creator.status !== 'approved') return false
+    creator.subscription = {
+      ...creator.subscription,
+      autoRenew: Boolean(enabled),
+      autoRenewPaymentMethod: enabled ? 'credit_card' : null,
+    }
+    persist()
+    return true
+  }
+
+  function leaveCreatorPlatform() {
+    const creator = currentCreator.value
+    if (!creator || backofficeSession.value?.role !== 'creator') return false
+    const leftAt = new Date().toISOString()
+    creator.status = 'suspended'
+    creator.exitedAt = leftAt
+    creator.subscription = {
+      ...creator.subscription,
+      status: 'cancelled',
+      autoRenew: false,
+      autoRenewPaymentMethod: null,
+      cancelledAt: leftAt,
+      demoStatus: null,
+    }
+    creator.reviewHistory = creator.reviewHistory || []
+    creator.reviewHistory.unshift({ status: 'suspended', date: new Date().toLocaleDateString('sv-SE'), note: '創作者已退出暮光集所，訂閱與信用卡固定扣款已取消。', reviewer: '創作者' })
+    orders.value
+      .filter((order) => order.creatorId === creator.id && order.status === 'processing')
+      .forEach((order) => {
+        order.status = 'cancelled'
+        order.refundStatus = 'refunded'
+        order.refundAmount = Number(order.total || 0)
+        order.refundedAt = leftAt
+        order.refundReason = '創作者退出暮光集所，未出貨訂單自動取消退款。'
+      })
+    backofficeSession.value = null
+    persist()
+    return true
+  }
+
+  function saveBanner(placement, payload) {
+    if (backofficeSession.value?.role !== 'admin' || !['products', 'about'].includes(placement)) return false
+    banners.value[placement] = {
+      enabled: Boolean(payload.enabled),
+      image: String(payload.image || '').trim(),
+      title: String(payload.title || '').trim(),
+      description: String(payload.description || '').trim(),
+      buttonLabel: String(payload.buttonLabel || '').trim(),
+      link: String(payload.link || '').trim(),
+      fit: payload.fit === 'contain' ? 'contain' : 'cover',
+      position: String(payload.position || 'center'),
+    }
+    persist()
+    return true
+  }
+
+  function saveHomeBanners(slides) {
+    if (backofficeSession.value?.role !== 'admin' || !Array.isArray(slides)) return false
+    const previousSlides = clone(banners.value.homeSlides)
+    banners.value.homeSlides = Array.from({ length: 8 }, (_, index) => {
+      const slide = slides[index] || emptyBanner()
+      return {
+        enabled: Boolean(slide.image),
+        image: String(slide.image || '').trim(),
+        title: '',
+        description: '',
+        buttonLabel: '',
+        link: '',
+        fit: slide.fit === 'contain' ? 'contain' : 'cover',
+        position: ['center', 'top', 'bottom', 'left', 'right'].includes(slide.position) ? slide.position : 'center',
+      }
+    })
+    banners.value.homeCarouselSeeded = true
+    try {
+      persist()
+    } catch {
+      banners.value.homeSlides = previousSlides
+      return false
+    }
+    return true
+  }
+
+  function saveStoryBanners(slides) {
+    if (backofficeSession.value?.role !== 'admin' || !Array.isArray(slides)) return false
+    const previousSlides = clone(banners.value.storySlides)
+    banners.value.storySlides = Array.from({ length: 8 }, (_, index) => {
+      const slide = slides[index] || emptyBanner()
+      return {
+        enabled: Boolean(slide.image),
+        image: String(slide.image || '').trim(),
+        title: '',
+        description: '',
+        buttonLabel: '',
+        link: '',
+        fit: 'cover',
+        position: 'center',
+      }
+    })
+    try {
+      persist()
+    } catch {
+      banners.value.storySlides = previousSlides
+      return false
+    }
+    return true
+  }
+
   function saveProduct(payload) {
     if (backofficeSession.value?.role !== 'creator') return false
     const creator = currentCreator.value
@@ -391,7 +572,7 @@ export const useMarketStore = defineStore('market', () => {
   function updateOrderStatus(id, status) {
     const order = orders.value.find((item) => item.id === id)
     const canManage = backofficeSession.value?.role === 'admin' || (backofficeSession.value?.role === 'creator' && order?.creatorId === backofficeSession.value.creatorId)
-    if (!order || !canManage || !['processing', 'shipped', 'completed'].includes(status)) return false
+    if (!order || order.status === 'cancelled' || !canManage || !['processing', 'shipped', 'completed'].includes(status)) return false
     order.status = status
     persist()
     return true
@@ -447,6 +628,16 @@ export const useMarketStore = defineStore('market', () => {
         expiresAt: addDays(approvedAt, 1),
       }
       creatorNotifications.value.unshift(notification)
+    }
+    if (status === 'suspended') {
+      creator.subscription = {
+        ...creator.subscription,
+        status: 'locked',
+        demoStatus: null,
+        autoRenew: false,
+        autoRenewPaymentMethod: null,
+        suspendedAt: new Date().toISOString(),
+      }
     }
     if (status === 'rejected' && previousStatus === 'pending') {
       const paidOrder = subscriptionOrders.value.find((order) => order.id === creator.subscription?.paidOrderId && order.status === 'paid')
@@ -556,12 +747,12 @@ export const useMarketStore = defineStore('market', () => {
   }
 
   return {
-    creators, products, orders, categories, customers, subscriptionOrders, creatorNotifications, cart, customerSession, backofficeSession, lastOrderIds,
+    creators, products, orders, categories, customers, subscriptionOrders, creatorNotifications, banners, cart, customerSession, backofficeSession, lastOrderIds,
     currentCreator, currentCustomer, activeProducts, cartCount, cartDetails, cartSubtotal,
     initialize, resetData, getCreator, getProduct, getCreatorSubscriptionStatus, canCreatorPublish, getProductAvailability, isProductPurchasable, addToCart, setCartQty, removeFromCart,
     backofficeLogin, backofficeLogout, customerLogin, customerLogout, registerCustomer, updateCustomer, getCustomerOrders, getCustomerOrder, registerCreator,
-    getCreatorSubscriptionOrders, payCreatorSubscription, getCreatorNotifications, getApprovalNotification, setDemoSubscriptionScenario, clearDemoSubscriptionScenario,
+    getCreatorSubscriptionOrders, payCreatorSubscription, getCreatorNotifications, getApprovalNotification, setDemoSubscriptionScenario, clearDemoSubscriptionScenario, setCreatorAutoRenew, leaveCreatorPlatform,
     saveProduct, deleteProduct, toggleProduct, updateOrderStatus, updateCreator, setCreatorStatus, resubmitCreator,
-    addCategory, renameCategory, deleteCategory, placeOrder,
+    addCategory, renameCategory, deleteCategory, saveBanner, saveHomeBanners, saveStoryBanners, placeOrder,
   }
 })

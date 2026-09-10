@@ -58,7 +58,7 @@ async function login() {
       error.value = result?.message || '登入失敗，請確認資料後再試一次'
       return
     }
-    await router.push(isAdmin.value ? '/admin/dashboard' : '/creator/onboarding')
+    await router.push(isAdmin.value ? '/admin/dashboard' : store.currentCreator?.status === 'approved' ? '/creator/dashboard' : '/creator/onboarding')
   } catch (loginError) {
     error.value = loginError?.message || '目前無法登入，請稍後再試'
   } finally {

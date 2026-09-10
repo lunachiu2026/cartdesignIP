@@ -14,6 +14,7 @@ const statusSteps = [
   { value: 'completed', label: '已完成', note: '謝謝你讓創作走進日常', icon: 'bi-house-heart' },
 ]
 const currentStep = computed(() => Math.max(0, statusSteps.findIndex((step) => step.value === order.value?.status)))
+const orderStatusLabel = computed(() => order.value?.status === 'cancelled' ? '已取消退款' : statusSteps.find((step) => step.value === order.value?.status)?.label || '處理中')
 const shippingAddress = computed(() => {
   const customer = order.value?.customer
   if (!customer) return '未提供'
@@ -39,11 +40,12 @@ const formatPrice = (value) => new Intl.NumberFormat('zh-TW').format(Number(valu
             <p>{{ order.createdAt }} 下單</p>
           </div>
           <span class="status-pill" :class="`status-${order.status}`">
-            {{ statusSteps.find((step) => step.value === order.status)?.label || '處理中' }}
+            {{ orderStatusLabel }}
           </span>
         </header>
 
-        <div class="timeline-card">
+        <div v-if="order.status === 'cancelled'" class="alert alert-danger mb-4" role="status"><i class="bi bi-arrow-counterclockwise me-2"></i><strong>訂單已取消並退款</strong><span class="d-block small mt-1">創作者退出平台，此筆未出貨訂單已自動取消，款項將退回原付款方式。</span></div>
+        <div v-else class="timeline-card">
           <div class="status-timeline">
             <div
               v-for="(step, index) in statusSteps"

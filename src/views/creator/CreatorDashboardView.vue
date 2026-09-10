@@ -20,6 +20,7 @@ const statusLabels = {
   processing: '處理中',
   shipped: '已出貨',
   completed: '已完成',
+  cancelled: '已取消退款',
 }
 
 const formatCurrency = (value) => new Intl.NumberFormat('zh-TW', {
@@ -46,7 +47,7 @@ const itemSummary = (items = []) => items.map((item) => `${item.name} x ${item.q
       </RouterLink>
     </div>
     <div v-if="subscriptionStatus === 'grace'" class="alert alert-warning d-flex gap-3 align-items-start mb-4"><i class="bi bi-hourglass-split fs-4"></i><div><strong class="d-block mb-1">月租已到期，現在是 3 天付款寬限期</strong>寬限期內仍可正常販售，請儘快完成續訂。 <RouterLink class="fw-bold" to="/creator/subscription">前往續訂</RouterLink></div></div>
-    <div v-if="subscriptionStatus === 'locked'" class="alert alert-danger d-flex gap-3 align-items-start mb-4"><i class="bi bi-lock fs-4"></i><div><strong class="d-block mb-1">上架功能已鎖定</strong>既有訂單仍可持續處理；前台商品目前顯示暫停販售，補繳後會自動恢復原本上架狀態。 <RouterLink class="fw-bold" to="/creator/subscription">立即補繳</RouterLink></div></div>
+    <div v-if="subscriptionStatus === 'locked'" class="alert alert-danger d-flex gap-3 align-items-start mb-4"><i class="bi bi-lock fs-4"></i><div><strong class="d-block mb-1">上架商品已鎖定</strong>既有訂單仍可查看；前台商品目前停止販售。重新付款後會送交管理員審核，核准當日才恢復並起算訂閱。 <RouterLink class="fw-bold" to="/creator/subscription/checkout">重新訂閱</RouterLink></div></div>
 
     <div v-if="store.currentCreator?.status === 'pending'" class="alert alert-warning d-flex gap-3 align-items-start mb-4" role="alert">
       <i class="bi bi-hourglass-split fs-4"></i>

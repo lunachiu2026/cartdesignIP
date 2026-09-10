@@ -24,6 +24,7 @@ const orderStatus = {
   processing: { label: '處理中', className: 'status-processing' },
   shipped: { label: '已出貨', className: 'status-shipped' },
   completed: { label: '已完成', className: 'status-completed' },
+  cancelled: { label: '已取消退款', className: 'status-suspended' },
 }
 
 function formatCurrency(value) {

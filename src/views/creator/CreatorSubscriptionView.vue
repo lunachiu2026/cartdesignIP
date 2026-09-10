@@ -41,7 +41,11 @@ const orderStatuses = {
 }
 
 const detail = computed(() => statusDetails[subscriptionStatus.value] || statusDetails.unpaid)
-const showRenewal = computed(() => creator.value?.status === 'approved' && ['grace', 'locked'].includes(subscriptionStatus.value))
+const showRenewal = computed(() => (creator.value?.status === 'approved' && ['grace', 'locked'].includes(subscriptionStatus.value)) || creator.value?.status === 'suspended')
+const autoRenew = computed({
+  get: () => subscription.value.autoRenew !== false,
+  set: (enabled) => store.setCreatorAutoRenew(enabled),
+})
 
 function formatDate(value) {
   if (!value) return '尚未建立'
@@ -118,7 +122,7 @@ onMounted(loadOrders)
           <div><span class="status-label">{{ detail.label }}</span><h2>{{ detail.title }}</h2><p>{{ detail.copy }}</p></div>
         </div>
         <div class="plan-price"><small>創作者月訂閱</small><strong>NT$299<span>／月</span></strong></div>
-        <RouterLink v-if="showRenewal" class="btn btn-accent" to="/creator/subscription/checkout">立即續訂 NT$299</RouterLink>
+        <RouterLink v-if="showRenewal" class="btn btn-accent" to="/creator/subscription/checkout">{{ creator.status === 'suspended' ? '重新訂閱並送審' : '立即續訂 NT$299' }}</RouterLink>
       </article>
 
       <div class="row g-4 mt-1">
@@ -133,6 +137,13 @@ onMounted(loadOrders)
               <div v-else><dt>下次續訂日</dt><dd>{{ subscriptionStatus === 'active' ? formatDate(subscription.nextBillingDate || subscription.currentPeriodEnd) : '完成續訂後重新計算' }}</dd></div>
             </dl>
             <div class="terms-reminder"><i class="bi bi-info-circle"></i><p><strong>計費規則</strong>通過審核當日才開始計算月週期；續訂失敗有 3 天寬限期，逾期後訂閱轉為鎖定。</p></div>
+            <div v-if="creator.status === 'approved'" class="auto-renew-option mt-3">
+              <div><strong>固定扣款續訂</strong><p>每期到期日以信用卡自動扣款 NT$299，避免訂閱中斷。</p></div>
+              <div class="form-check form-switch m-0">
+                <input id="auto-renew" v-model="autoRenew" class="form-check-input" type="checkbox" role="switch">
+                <label class="form-check-label" for="auto-renew">{{ autoRenew ? '已開啟' : '已關閉' }}</label>
+              </div>
+            </div>
           </article>
 
           <article class="panel-card">
@@ -199,6 +210,10 @@ onMounted(loadOrders)
 .terms-reminder { display: flex; gap: .7rem; margin-top: 1rem; padding: 1rem; color: var(--ink-soft); background: var(--cream); border-radius: 12px; font-size: .78rem; line-height: 1.65; }
 .terms-reminder p { margin: 0; }
 .terms-reminder strong { display: block; color: var(--ink); }
+.auto-renew-option { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; }
+.auto-renew-option p { margin: .25rem 0 0; color: var(--ink-soft); font-size: .78rem; }
+.auto-renew-option .form-check-input { width: 2.4em; cursor: pointer; }
+.auto-renew-option .form-check-label { margin-left: .35rem; white-space: nowrap; font-size: .82rem; font-weight: 700; }
 .history-list { display: grid; }
 .history-item { display: flex; gap: 1rem; align-items: center; padding: 1.1rem 0; border-top: 1px solid var(--line); }
 .history-item:first-child { border-top: 0; }
@@ -241,5 +256,6 @@ onMounted(loadOrders)
   .history-item { align-items: start; }
   .history-amount { justify-items: start; width: 100%; }
   .history-item { flex-wrap: wrap; }
+  .auto-renew-option { align-items: start; flex-direction: column; }
 }
 </style>

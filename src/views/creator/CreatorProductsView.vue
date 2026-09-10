@@ -53,7 +53,7 @@ function removeProduct(product) {
       </RouterLink>
     </div>
 
-    <div v-if="subscriptionStatus === 'locked'" class="alert alert-danger d-flex justify-content-between align-items-center gap-3"><span><i class="bi bi-lock me-2"></i>月租逾期，新增與上架功能已鎖定；已成立訂單不受影響。</span><RouterLink class="btn btn-sm btn-primary" to="/creator/subscription">前往補繳</RouterLink></div>
+    <div v-if="subscriptionStatus === 'locked'" class="alert alert-danger d-flex justify-content-between align-items-center gap-3"><span><i class="bi bi-lock me-2"></i>商品管理與販售功能已鎖定；重新付款後需等待管理員審核。</span><RouterLink class="btn btn-sm btn-primary" to="/creator/subscription/checkout">重新訂閱</RouterLink></div>
 
     <div class="panel">
       <div class="row g-2 mb-4">
@@ -111,7 +111,7 @@ function removeProduct(product) {
                   type="button"
                   class="btn p-0 border-0"
                    :title="product.status === 'active' ? '點擊下架' : canPublish ? '點擊上架' : '月租逾期，無法上架'"
-                   :disabled="product.status !== 'active' && !canPublish"
+                   :disabled="!canPublish"
                   @click="toggleStatus(product)"
                 >
                   <span class="status-pill" :class="`status-${product.status}`">
@@ -120,12 +120,13 @@ function removeProduct(product) {
                 </button>
               </td>
               <td class="text-end text-nowrap">
-                <RouterLink class="btn btn-sm btn-outline-ink me-2" :to="`/creator/products/${product.id}/edit`">
+                <RouterLink v-if="canPublish" class="btn btn-sm btn-outline-ink me-2" :to="`/creator/products/${product.id}/edit`">
                   <i class="bi bi-pencil"></i><span class="visually-hidden">編輯</span>
                 </RouterLink>
-                <button class="btn btn-sm btn-outline-danger" type="button" @click="removeProduct(product)">
+                <button v-if="canPublish" class="btn btn-sm btn-outline-danger" type="button" @click="removeProduct(product)">
                   <i class="bi bi-trash3"></i><span class="visually-hidden">刪除</span>
                 </button>
+                <span v-else class="text-danger small"><i class="bi bi-lock me-1"></i>已鎖定</span>
               </td>
             </tr>
           </tbody>

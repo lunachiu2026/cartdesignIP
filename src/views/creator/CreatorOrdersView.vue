@@ -9,6 +9,7 @@ const statuses = [
   { value: 'processing', label: '處理中' },
   { value: 'shipped', label: '已出貨' },
   { value: 'completed', label: '已完成' },
+  { value: 'cancelled', label: '已取消退款', disabled: true },
 ]
 
 const creatorOrders = computed(() => store.orders.filter((order) => order.creatorId === store.backofficeSession?.creatorId))
@@ -24,7 +25,7 @@ const formatCurrency = (value) => new Intl.NumberFormat('zh-TW', {
 
 function changeStatus(order, status) {
   if (order.creatorId !== store.backofficeSession?.creatorId) return
-  if (!statuses.some((item) => item.value === status)) return
+  if (!statuses.some((item) => item.value === status && !item.disabled)) return
   store.updateOrderStatus(order.id, status)
 }
 </script>
@@ -87,9 +88,10 @@ function changeStatus(order, status) {
                   :id="`status-${order.id}`"
                   class="form-select form-select-sm"
                   :value="order.status"
+                  :disabled="order.status === 'cancelled'"
                   @change="changeStatus(order, $event.target.value)"
                 >
-                  <option v-for="status in statuses" :key="status.value" :value="status.value">{{ status.label }}</option>
+                  <option v-for="status in statuses" :key="status.value" :value="status.value" :disabled="status.disabled">{{ status.label }}</option>
                 </select>
               </td>
             </tr>

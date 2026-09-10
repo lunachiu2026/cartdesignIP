@@ -9,6 +9,7 @@ import CartView from '../views/CartView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
 import OrderCompleteView from '../views/OrderCompleteView.vue'
 import BackofficeAuthView from '../views/BackofficeAuthView.vue'
+import BackofficeAccessDeniedView from '../views/BackofficeAccessDeniedView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import CustomerAuthView from '../views/account/CustomerAuthView.vue'
 import CustomerOrdersView from '../views/account/CustomerOrdersView.vue'
@@ -30,6 +31,7 @@ import AdminCreatorDetailView from '../views/admin/AdminCreatorDetailView.vue'
 import AdminProductsView from '../views/admin/AdminProductsView.vue'
 import AdminCategoriesView from '../views/admin/AdminCategoriesView.vue'
 import AdminOrdersView from '../views/admin/AdminOrdersView.vue'
+import AdminBannersView from '../views/admin/AdminBannersView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +52,7 @@ const router = createRouter({
     { path: '/creator/register', name: 'creator-register', component: BackofficeAuthView, meta: { layout: 'auth' } },
     { path: '/creator/mail', name: 'creator-mail', component: CreatorMailView },
     { path: '/muguang/admin', name: 'admin-login', component: BackofficeAuthView, meta: { layout: 'auth' } },
+    { path: '/backoffice/access-denied', name: 'backoffice-access-denied', component: BackofficeAccessDeniedView, meta: { layout: 'auth' } },
     {
       path: '/creator',
       component: BackofficeLayout,
@@ -82,6 +85,7 @@ const router = createRouter({
         { path: 'products', name: 'admin-products', component: AdminProductsView },
         { path: 'categories', name: 'admin-categories', component: AdminCategoriesView },
         { path: 'orders', name: 'admin-orders', component: AdminOrdersView },
+        { path: 'banners', name: 'admin-banners', component: AdminBannersView },
       ],
     },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView },
@@ -96,14 +100,19 @@ router.beforeEach((to) => {
   }
   if ((to.name === 'account-login' || to.name === 'account-register') && store.customerSession) return '/account/orders'
   if (['creator-login', 'creator-register', 'admin-login'].includes(String(to.name)) && store.backofficeSession) {
+    const isAdminPortal = to.name === 'admin-login'
+    const hasMatchingRole = (isAdminPortal && store.backofficeSession.role === 'admin') || (!isAdminPortal && store.backofficeSession.role === 'creator')
+    if (!hasMatchingRole) return '/backoffice/access-denied'
     return store.backofficeSession.role === 'admin' ? '/admin/dashboard' : '/creator/dashboard'
   }
   const requiredRole = to.meta.role
   if (!requiredRole) return true
   if (!store.backofficeSession) return requiredRole === 'admin' ? '/muguang/admin' : '/creator/login'
-  if (store.backofficeSession.role !== requiredRole) return store.backofficeSession.role === 'admin' ? '/admin/dashboard' : '/creator/dashboard'
+  if (store.backofficeSession.role !== requiredRole) return '/backoffice/access-denied'
   if (requiredRole === 'creator') {
-    if (to.meta.creatorApproved && store.currentCreator?.status !== 'approved') return '/creator/onboarding'
+    const creatorStatus = store.currentCreator?.status
+    const suspendedWorkspaceRoute = creatorStatus === 'suspended' && ['creator-dashboard', 'creator-products', 'creator-orders'].includes(String(to.name))
+    if (to.meta.creatorApproved && creatorStatus !== 'approved' && !suspendedWorkspaceRoute) return '/creator/onboarding'
     if (to.meta.creatorPublish && !store.canCreatorPublish(store.currentCreator?.id)) return store.currentCreator?.status === 'approved' ? '/creator/subscription' : '/creator/onboarding'
   }
   return true

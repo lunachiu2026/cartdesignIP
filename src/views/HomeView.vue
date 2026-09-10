@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ProductCard from '../components/ProductCard.vue'
+import PageBannerCarousel from '../components/PageBannerCarousel.vue'
 import { useMarketStore } from '../stores/market'
 
 const store = useMarketStore()
@@ -19,27 +20,25 @@ onMounted(() => {
     <section class="hero-section">
       <div class="hero-orbit orbit-one"></div>
       <div class="hero-orbit orbit-two"></div>
-      <div class="container position-relative">
-        <div class="row align-items-center g-5">
-          <div class="col-lg-6">
-            <p class="eyebrow mb-3">Made slowly, kept dearly</p>
-            <h1 class="hero-title">讓手作的微光，<br />落進你的日常。</h1>
-            <p class="hero-copy mt-4">匯集紙品、陶藝與生活布作，認識作品背後的創作者，挑一件能陪你很久的物件。</p>
-            <div class="d-flex flex-wrap gap-3 mt-4">
-              <RouterLink class="btn btn-primary px-4" to="/products">開始逛選物</RouterLink>
-              <RouterLink class="btn btn-outline-ink px-4" to="/creator/register">成為創作者</RouterLink>
-            </div>
-            <div class="hero-proof mt-5">
-              <div><strong>30+</strong><span>島嶼品牌</span></div>
-              <div><strong>180</strong><span>手作選物</span></div>
-              <div><strong>4.9</strong><span>平均評價</span></div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="hero-collage">
-              <img class="hero-main-image" src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1100&q=85" alt="文創工作桌與紙品" />
-              <div class="floating-note"><i class="bi bi-flower1"></i><span>本月主題</span><strong>採集春日</strong></div>
-              <img class="hero-small-image" src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=500&q=85" alt="手作陶杯" />
+      <div class="hero-banner-full position-relative">
+        <PageBannerCarousel :banners="store.banners.homeSlides" embedded full-width />
+        <div class="container hero-overlay">
+          <div class="row h-100 align-items-center">
+            <div class="col-lg-6">
+              <div class="hero-content">
+                <p class="eyebrow mb-3">Made slowly, kept dearly</p>
+                <h1 class="hero-title">讓手作的微光，<br />落進你的日常。</h1>
+                <p class="hero-copy mt-4">匯集紙品、陶藝與生活布作，認識作品背後的創作者，挑一件能陪你很久的物件。</p>
+                <div class="hero-actions d-flex flex-wrap gap-3 mt-4">
+                  <RouterLink class="btn btn-primary px-4" to="/products">開始逛選物</RouterLink>
+                  <RouterLink class="btn btn-outline-ink px-4" to="/creator/register">成為創作者</RouterLink>
+                </div>
+                <div class="hero-proof mt-5">
+                  <div><strong>30+</strong><span>島嶼品牌</span></div>
+                  <div><strong>180</strong><span>手作選物</span></div>
+                  <div><strong>4.9</strong><span>平均評價</span></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -71,10 +70,7 @@ onMounted(() => {
       <div class="container">
         <div class="row align-items-center g-5">
           <div class="col-lg-6">
-            <div class="story-image-wrap">
-              <img src="https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1100&q=85" alt="創作者正在手作" />
-              <span class="story-caption">一雙手，一段慢慢成形的故事。</span>
-            </div>
+            <PageBannerCarousel :banners="store.banners.storySlides" embedded />
           </div>
           <div class="col-lg-5 offset-lg-1">
             <p class="eyebrow">Why Muguang</p>
@@ -120,25 +116,33 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.hero-section { position: relative; overflow: hidden; padding: 7rem 0 6rem; background: linear-gradient(130deg, #f8f1e8 0%, #edf1e7 100%); }
-.hero-title { max-width: 660px; font-size: clamp(3rem, 6.3vw, 5.6rem); line-height: 1.22; letter-spacing: -.04em; }
-.hero-copy { max-width: 560px; color: var(--ink-soft); font-size: 1.08rem; line-height: 1.9; }
+.hero-section { position: relative; overflow: hidden; padding: 0; background: var(--ink); }
+.hero-title { max-width: 660px; margin-bottom: 0; color: white; font-size: clamp(2.5rem, 4.4vw, 4rem); line-height: 1.22; letter-spacing: -.04em; }
+.hero-copy { max-width: 560px; color: rgba(255,255,255,.88); font-size: 1.08rem; line-height: 1.9; }
+.hero-banner-full { width: 100%; }
+.hero-overlay { position: absolute; z-index: 3; inset: 0; height: 100%; pointer-events: none; }
+.hero-content { max-width: 650px; color: white; text-shadow: 0 2px 22px rgba(0,0,0,.7); }
+.hero-content .eyebrow { color: rgba(255,255,255,.82); }
+.hero-actions, .hero-actions a { pointer-events: auto; text-shadow: none; }
+.hero-actions .btn-outline-ink { color: white; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.8); }
+.hero-actions .btn-outline-ink:hover { color: var(--ink); background: white; border-color: white; }
 .hero-proof { display: flex; gap: 2rem; }
 .hero-proof div { display: flex; flex-direction: column; }
 .hero-proof strong { font-family: 'Noto Serif TC', serif; font-size: 1.35rem; }
-.hero-proof span { color: var(--ink-soft); font-size: .75rem; }
+.hero-proof span { color: rgba(255,255,255,.82); font-size: .75rem; }
 .hero-collage { position: relative; min-height: 560px; }
 .hero-main-image { width: 85%; height: 500px; margin-left: 8%; object-fit: cover; border-radius: 48% 48% 18px 18px; box-shadow: var(--shadow); }
 .hero-small-image { position: absolute; right: 0; bottom: 0; width: 34%; aspect-ratio: 1; object-fit: cover; border: 8px solid var(--cream); border-radius: 50%; }
 .floating-note { position: absolute; left: 0; bottom: 60px; display: grid; min-width: 160px; padding: 1rem; background: var(--paper); border-radius: 16px; box-shadow: var(--shadow); }
 .floating-note i { color: var(--terracotta); font-size: 1.3rem; }.floating-note span { color: var(--ink-soft); font-size: .7rem; }.floating-note strong { font-family: 'Noto Serif TC', serif; }
-.hero-orbit { position: absolute; border: 1px solid rgba(113, 140, 120, .28); border-radius: 50%; }.orbit-one { top: -240px; right: -100px; width: 700px; height: 700px; }.orbit-two { bottom: -350px; left: -260px; width: 650px; height: 650px; }
+.hero-orbit { position: absolute; z-index: 1; pointer-events: none; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; }.orbit-one { top: -240px; right: -100px; width: 700px; height: 700px; }.orbit-two { bottom: -350px; left: -260px; width: 650px; height: 650px; }
 .marquee-strip { padding: 1.2rem 0; color: white; background: var(--ink); font-size: .85rem; }.marquee-strip i { color: #bfd2bc; margin-right: .35rem; }
 .text-link { color: var(--terracotta); font-weight: 700; }
 .story-section { background: #ece7dd; }.story-image-wrap { position: relative; }.story-image-wrap img { width: 100%; height: 650px; object-fit: cover; border-radius: 220px 220px 22px 22px; }.story-caption { position: absolute; right: -25px; bottom: 35px; max-width: 230px; padding: 1rem 1.2rem; background: var(--paper); border-radius: 12px; box-shadow: var(--shadow); font-family: 'Noto Serif TC', serif; }
 .story-points > div { display: flex; gap: 1rem; margin-top: 1rem; }.story-points span { display: grid; flex: 0 0 42px; place-items: center; height: 42px; border: 1px solid var(--ink); border-radius: 50%; font-size: .72rem; }.story-points p { margin: 0; color: var(--ink-soft); line-height: 1.65; }.story-points strong { color: var(--ink); }
 .creator-section { background: var(--paper); }.creator-feature-card { display: block; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: var(--cream); transition: transform .25s ease; }.creator-feature-card:hover { transform: translateY(-5px); }.creator-feature-card > img { width: 100%; height: 230px; object-fit: cover; }.creator-feature-content { position: relative; padding: 3rem 1.4rem 1.5rem; }.creator-avatar { position: absolute; top: -36px; left: 1.4rem; width: 70px; height: 70px; object-fit: cover; border: 5px solid var(--cream); border-radius: 50%; }.creator-feature-content small { color: var(--terracotta); }.creator-feature-content h3 { margin: .25rem 0 .65rem; font-size: 1.35rem; }.creator-feature-content p { min-height: 48px; color: var(--ink-soft); font-size: .84rem; line-height: 1.7; }.arrow-circle { position: absolute; right: 1.4rem; bottom: 1.4rem; display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--ink); border-radius: 50%; }
 .creator-cta { color: white; background: var(--terracotta); }.creator-cta h2 { font-size: clamp(1.8rem, 4vw, 3rem); }.creator-cta p { margin-bottom: 0; color: rgba(255,255,255,.78); }
-@media (max-width: 991.98px) { .hero-section { padding-top: 5rem; }.hero-collage { min-height: 440px; }.hero-main-image { height: 400px; }.story-image-wrap img { height: 500px; }.story-caption { right: 15px; } }
+@media (max-width: 991.98px) { .hero-collage { min-height: 440px; }.hero-main-image { height: 400px; }.story-image-wrap img { height: 500px; }.story-caption { right: 15px; } }
+@media (max-width: 767.98px) { .hero-overlay { padding-top: 2rem; padding-bottom: 2rem; }.hero-title { font-size: clamp(2.35rem, 11vw, 3.4rem); } }
 @media (max-width: 575.98px) { .hero-proof { gap: 1rem; justify-content: space-between; }.hero-collage { min-height: 360px; }.hero-main-image { height: 330px; }.floating-note { left: 5px; bottom: 20px; }.story-image-wrap img { height: 420px; }.creator-feature-card > img { height: 190px; } }
 </style>
